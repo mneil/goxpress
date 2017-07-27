@@ -75,6 +75,31 @@ func GetUser(w http.ResponseWriter, r *http.Request, c *goxpress.Context) (strin
 
 ```
 
+## Performance
+
+Performance is anecdotal but in case you're wondering here are some benchmarks using the example script above to request the user/:id route.
+
+```
+siege -c96 -t60s http://192.168.1.181:4000/users/1
+** SIEGE 3.0.5
+** Preparing 96 concurrent users for battle.
+The server is now under siege...
+Lifting the server siege...      done.
+
+Transactions:                  11243 hits
+Availability:                 100.00 %
+Elapsed time:                  59.26 secs
+Data transferred:               0.00 MB
+Response time:                  0.01 secs
+Transaction rate:             189.72 trans/sec
+Throughput:                     0.00 MB/sec
+Concurrency:                    1.60
+Successful transactions:       11243
+Failed transactions:               0
+Longest transaction:            0.36
+Shortest transaction:           0.00
+```
+
 **ROADMAP**
 
  [x] pattern matching routes
