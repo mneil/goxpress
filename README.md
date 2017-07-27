@@ -102,12 +102,12 @@ Shortest transaction:           0.00
 
 **ROADMAP**
 
- [x] pattern matching routes
- [x] route based on http method
- [x] ability to pass context between requests
- [] cors settings
- [] ability to add catch-all route
- [] cookie management
- [] global response header management
- [] simplify response writer interface
- [] static file server
+ [x] pattern matching routes  
+ [x] route based on http method  
+ [x] ability to pass context between requests  
+ [] cors settings  
+ [] ability to add catch-all route  
+ [] cookie management  
+ [] global response header management  
+ [] simplify response writer interface  
+ [] static file server  
