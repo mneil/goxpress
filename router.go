@@ -37,8 +37,17 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		data: make(map[string]interface{}),
 	}
 
-	if len(middlewares) != 0 {
+	path := req.URL.Path
+	var handle Handle
 
+	// Lookup the handle and process the path to determine request params so we can pass into middleware
+	if root := r.trees[req.Method]; root != nil {
+		if handle, ps, _ := root.getValue(path); handle != nil {
+			ctx.Params = ps
+		}
+	}
+	// Iterate over available middlewares
+	if len(middlewares) != 0 {
 		for _, middleware := range middlewares {
 			res, err := middleware(w, req, ctx)
 			if err != nil {
@@ -53,13 +62,13 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	path := req.URL.Path
-	if root := r.trees[req.Method]; root != nil {
-		if handle, ps, _ := root.getValue(path); handle != nil {
-			ctx.Params = ps
-			handle(w, req, ctx)
-		}
+	// Handle the route if it exists
+	if handle != nil {
+		handle(w, req, ctx)
+		return
 	}
+
+	w.WriteHeader(http.StatusNotFound)
 }
 
 // Handler helps implement the ServeMux interface. Not recommended for use however because it
@@ -82,22 +91,21 @@ func (r *Router) HandleFunc(pattern string, handler http.Handler) {
 // Handle is a generic method for adding a request handle on a pattern route and method
 func (r *Router) Handle(method, path string, handle Handle) {
 	if path[0] != '/' {
-		panic("path must begin with '/' in path '" + path + "'")
+		panic(fmt.Sprintf("path must begin with '/' in path '%s'", path))
 	}
 
 	if r.trees == nil {
 		r.trees = make(map[string]*node)
 	}
-
-	root := r.trees[method]
-	if root == nil {
+	var root node
+	if root := r.trees[method]; root == nil {
 		root = new(node)
 		r.trees[method] = root
 	}
 	root.addRoute(path, handle)
 }
 
-// Add middleware to Router request/response cycle
+// Use middleware to route request/response cycle
 func (*Router) Use(middleware func(w http.ResponseWriter, r *http.Request, c *Context) (string, error)) {
 	middlewares = append(middlewares, middleware)
 }
