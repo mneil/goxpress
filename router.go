@@ -3,6 +3,7 @@ package goxpress
 import (
 	"fmt"
 	"net/http"
+	"time"
 )
 
 // Handle defines the signature of a request handler for a route
@@ -18,8 +19,11 @@ type Router struct {
 func (r *Router) Listen(port int) (*http.Server, error) {
 
 	s := &http.Server{
-		Addr:    fmt.Sprintf(":%d", port),
-		Handler: r,
+		Addr:           fmt.Sprintf(":%d", port),
+		Handler:        r,
+		ReadTimeout:    60 * time.Second,
+		WriteTimeout:   60 * time.Second,
+		MaxHeaderBytes: 1 << 20,
 	}
 	return s, s.ListenAndServe()
 }
