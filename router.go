@@ -39,13 +39,14 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	path := req.URL.Path
 	var handle Handle
+	var ps Params
 
-	// Lookup the handle and process the path to determine request params so we can pass into middleware
 	if root := r.trees[req.Method]; root != nil {
-		if handle, ps, _ := root.getValue(path); handle != nil {
+		if handle, ps, _ = root.getValue(path); handle != nil {
 			ctx.Params = ps
 		}
 	}
+
 	// Iterate over available middlewares
 	if len(middlewares) != 0 {
 		for _, middleware := range middlewares {
@@ -97,8 +98,8 @@ func (r *Router) Handle(method, path string, handle Handle) {
 	if r.trees == nil {
 		r.trees = make(map[string]*node)
 	}
-	var root node
-	if root := r.trees[method]; root == nil {
+	root := r.trees[method]
+	if root == nil {
 		root = new(node)
 		r.trees[method] = root
 	}
