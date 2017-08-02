@@ -50,14 +50,10 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	// Iterate over available middlewares
 	if len(middlewares) != 0 {
 		for _, middleware := range middlewares {
-			res, err := middleware(w, req, ctx)
+			err := middleware(w, req, ctx)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Write([]byte(err.Error()))
-				return
-			}
-			if res != "" {
-				w.Write([]byte(res))
 				return
 			}
 		}
@@ -107,12 +103,12 @@ func (r *Router) Handle(method, path string, handle Handle) {
 }
 
 // Use middleware to route request/response cycle
-func (*Router) Use(middleware func(w http.ResponseWriter, r *http.Request, c *Context) (string, error)) {
+func (*Router) Use(middleware func(w http.ResponseWriter, r *http.Request, c *Context) error) {
 	middlewares = append(middlewares, middleware)
 }
 
 // middlewares keeps track of middleware that was added
-var middlewares = make([]func(w http.ResponseWriter, r *http.Request, c *Context) (string, error), 0, 5)
+var middlewares = make([]func(w http.ResponseWriter, r *http.Request, c *Context) error, 0, 5)
 
 // GET registers a path to a GET request
 func (r *Router) GET(path string, handle Handle) {
