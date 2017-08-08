@@ -6,9 +6,11 @@ type Context struct {
 	Params
 }
 
-// Init initializes data so that context can be set
-func (r *Context) Init() {
-	r.data = make(map[string]interface{})
+// NewContext initializes data so that context can be set
+func NewContext() *Context {
+	return &Context{
+		data: make(map[string]interface{}),
+	}
 }
 
 // Get returns the value of interface of some request context

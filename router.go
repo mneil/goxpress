@@ -33,9 +33,7 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	defer req.Body.Close()
 
-	var ctx = &Context{
-		data: make(map[string]interface{}),
-	}
+	ctx := NewContext()
 
 	path := req.URL.Path
 	var handle Handle
